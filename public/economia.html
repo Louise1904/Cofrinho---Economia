@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cofrinho · finanças leves</title>
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <header class="topo">
+    <div class="marca-topo">
+      <img class="logo" src="/img/logo.svg" alt="" width="38" height="38" />
+      <div class="marca-texto">
+        <strong>Cofrinho</strong>
+        <small>finanças leves</small>
+      </div>
+    </div>
+    <div class="usuario">
+      <div class="perfil">
+        <span class="avatar" id="avatar" aria-hidden="true"></span>
+        <div class="perfil-texto">
+          <strong id="nome-usuario"></strong>
+          <small id="email-usuario"></small>
+        </div>
+      </div>
+      <button class="sair" id="btn-sair" title="Sair da conta">Sair</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="barra-controles">
+      <nav class="abas" role="tablist">
+        <button role="tab" data-aba="lancamentos" class="ativa">Lançamentos</button>
+        <button role="tab" data-aba="metas">Metas</button>
+        <button role="tab" data-aba="investimentos">Investimentos</button>
+        <button role="tab" data-aba="relatorios">Relatórios</button>
+      </nav>
+
+      <div class="seletor-mes">
+        <button type="button" class="seta" id="mes-anterior" title="Mês anterior" aria-label="Mês anterior">‹</button>
+        <label class="mes-atual" title="Escolher mês">
+          <span id="mes-nome"></span>
+          <input type="month" id="mes" aria-label="Escolher mês" />
+        </label>
+        <button type="button" class="seta" id="mes-proximo" title="Próximo mês" aria-label="Próximo mês">›</button>
+        <button type="button" class="hoje" id="mes-hoje" hidden>Mês atual</button>
+      </div>
+    </div>
+
+    <section class="resumo">
+      <div class="card azul">
+        <span>Total recebido</span>
+        <p id="total-receitas">R$ 0,00</p>
+        <div class="detalhe" id="detalhe-receitas"></div>
+      </div>
+      <div class="card rosa">
+        <span>Total de gastos</span>
+        <p id="total-gastos" class="negativo">R$ 0,00</p>
+      </div>
+      <div class="card misto">
+        <span>Economia do mês</span>
+        <p id="total-economia">R$ 0,00</p>
+        <div class="detalhe" id="percentual-economia"></div>
+      </div>
+    </section>
+
+    <!-- Aba Metas (caixinhas) -->
+    <section id="aba-metas" role="tabpanel" hidden>
+      <div class="metas-resumo">
+        <div class="mini-card">
+          <span>Total guardado nas caixinhas</span>
+          <strong id="metas-total"></strong>
+        </div>
+        <div class="mini-card">
+          <span id="metas-mes-rotulo">Guardado neste mês</span>
+          <strong id="metas-mes"></strong>
+        </div>
+        <div class="mini-card">
+          <span>Economia do mês ainda livre</span>
+          <strong id="metas-livre"></strong>
+          <small>economia do mês − guardado no mês</small>
+        </div>
+      </div>
+
+      <div class="caixinhas" id="lista-caixinhas"></div>
+    </section>
+
+    <!-- Aba Investimentos -->
+    <section id="aba-investimentos" role="tabpanel" hidden>
+      <div class="metas-resumo">
+        <div class="mini-card">
+          <span>Patrimônio investido hoje</span>
+          <strong id="inv-total"></strong>
+        </div>
+        <div class="mini-card">
+          <span>Total aplicado</span>
+          <strong id="inv-aplicado"></strong>
+          <small>aportes − resgates</small>
+        </div>
+        <div class="mini-card">
+          <span>Rendimento</span>
+          <strong id="inv-rendimento"></strong>
+          <small id="inv-rendimento-pct"></small>
+        </div>
+        <div class="mini-card">
+          <span id="inv-mes-rotulo">Aportado neste mês</span>
+          <strong id="inv-mes"></strong>
+        </div>
+      </div>
+
+      <div class="caixinhas" id="lista-investimentos"></div>
+
+      <div class="card" id="inv-distribuicao" hidden>
+        <div class="grafico-topo">
+          <div>
+            <h3>Onde está o seu dinheiro</h3>
+            <p class="sub">Valor atual por tipo de investimento</p>
+          </div>
+        </div>
+        <div class="area-grafico" id="area-distribuicao">
+          <canvas id="grafico-distribuicao" aria-label="Gráfico do patrimônio por tipo de investimento" role="img"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Aba Relatórios -->
+    <section id="aba-relatorios" role="tabpanel" hidden>
+      <div class="card filtros-relatorio">
+        <div class="fr-linha">
+          <span class="rotulo">Período</span>
+          <div class="chips-filtro" id="rel-periodo">
+            <button type="button" data-periodo="mes">Mês selecionado</button>
+            <button type="button" data-periodo="3">3 meses</button>
+            <button type="button" data-periodo="6" class="ativo">6 meses</button>
+            <button type="button" data-periodo="12">12 meses</button>
+            <button type="button" data-periodo="ano">Ano</button>
+            <button type="button" data-periodo="personalizado">Personalizado</button>
+          </div>
+        </div>
+        <div class="fr-personalizado" id="rel-personalizado" hidden>
+          <label for="rel-de">De</label>
+          <input type="month" id="rel-de" />
+          <label for="rel-ate">até</label>
+          <input type="month" id="rel-ate" />
+        </div>
+        <div class="fr-linha">
+          <span class="rotulo">Recebimentos</span>
+          <div class="chips-filtro" id="rel-tipos"></div>
+        </div>
+        <div class="fr-linha">
+          <span class="rotulo">Categorias de gasto</span>
+          <div class="chips-filtro rosa" id="rel-categorias"></div>
+        </div>
+        <div class="fr-rodape">
+          <span id="rel-descricao"></span>
+          <button type="button" class="link" id="rel-limpar">Limpar filtros</button>
+        </div>
+      </div>
+
+      <div class="metas-resumo">
+        <div class="mini-card">
+          <span>Recebido no período</span>
+          <strong id="rel-recebido"></strong>
+        </div>
+        <div class="mini-card">
+          <span>Gastos no período</span>
+          <strong id="rel-gastos" class="negativo"></strong>
+        </div>
+        <div class="mini-card">
+          <span>Economia no período</span>
+          <strong id="rel-economia"></strong>
+          <small id="rel-economia-pct"></small>
+        </div>
+        <div class="mini-card">
+          <span>Média de gastos por mês</span>
+          <strong id="rel-media"></strong>
+          <small id="rel-maior-mes"></small>
+        </div>
+      </div>
+
+      <div class="graficos">
+      <div class="card">
+        <div class="grafico-topo">
+          <div>
+            <h3>Recebido x gastos</h3>
+            <p class="sub" id="sub-evolucao"></p>
+          </div>
+        </div>
+        <div class="legenda">
+          <span><i style="background:var(--serie-receitas)"></i>Recebido</span>
+          <span><i style="background:var(--serie-gastos)"></i>Gastos</span>
+        </div>
+        <div class="area-grafico">
+          <canvas id="grafico-evolucao" aria-label="Gráfico de recebido e gastos por mês" role="img"></canvas>
+        </div>
+        <button class="link" id="btn-tabela-evolucao" style="margin-top:10px;font-size:13px">Ver como tabela</button>
+        <div class="tabela-wrap" id="tabela-evolucao" hidden>
+          <table>
+            <thead><tr><th>Mês</th><th class="valor">Recebido</th><th class="valor">Gastos</th><th class="valor">Economia</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="grafico-topo">
+          <div>
+            <h3>Gastos por categoria</h3>
+            <p class="sub" id="sub-categorias"></p>
+          </div>
+        </div>
+        <div class="area-grafico" id="area-categorias">
+          <canvas id="grafico-categorias" aria-label="Gráfico de gastos por categoria" role="img"></canvas>
+          <div class="grafico-vazio" id="categorias-vazio" hidden>Nenhum gasto no período com esses filtros.</div>
+        </div>
+      </div>
+      </div>
+    </section>
+
+    <!-- Aba Lançamentos -->
+    <section class="colunas" id="aba-lancamentos" role="tabpanel">
+      <!-- Receitas -->
+      <div class="card">
+        <h3 class="titulo-secao"><span class="icone azul" aria-hidden="true">↓</span>Recebimentos</h3>
+        <form id="form-receita">
+          <span class="rotulo">Tipo de recebimento</span>
+          <div class="opcoes" role="radiogroup" aria-label="Tipo de recebimento" id="rec-tipos"></div>
+
+          <div class="linha">
+            <div>
+              <label for="rec-valor">Valor</label>
+              <div class="campo-moeda">
+                <span>R$</span>
+                <input id="rec-valor" name="valor" type="number" step="0.01" min="0.01" placeholder="0,00" required />
+              </div>
+            </div>
+            <div>
+              <label for="rec-data">Data do recebimento</label>
+              <input id="rec-data" name="data_recebimento" type="date" required />
+            </div>
+          </div>
+          <label for="rec-descricao">Descrição <span class="opcional">opcional</span></label>
+          <input id="rec-descricao" name="descricao" type="text" maxlength="200" placeholder="Ex.: Plantão do fim de semana" />
+          <p class="erro" id="erro-receita"></p>
+          <button type="submit">Adicionar recebimento</button>
+        </form>
+
+        <div class="filtros" id="filtros-receitas" hidden>
+          <div class="filtros-linha">
+            <div class="busca">
+              <span aria-hidden="true">🔍</span>
+              <input type="search" data-filtro="busca" placeholder="Buscar recebimento…" aria-label="Buscar recebimento…" />
+            </div>
+            <select data-filtro="ordem" aria-label="Ordenar recebimentos">
+              <option value="recentes">Mais recentes</option>
+              <option value="antigos">Mais antigos</option>
+              <option value="maior">Maior valor</option>
+              <option value="menor">Menor valor</option>
+            </select>
+          </div>
+          <div class="chips-filtro" aria-label="Filtrar por grupo"></div>
+          <p class="resultado-filtro"></p>
+        </div>
+
+        <div class="tabela-wrap">
+          <table>
+            <thead><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th class="valor">Valor</th><th></th></tr></thead>
+            <tbody id="lista-receitas"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Gastos -->
+      <div class="card">
+        <h3 class="titulo-secao"><span class="icone rosa" aria-hidden="true">↑</span>Gastos</h3>
+        <form id="form-gasto">
+          <label for="gas-descricao">Descrição</label>
+          <input id="gas-descricao" name="descricao" type="text" maxlength="200" placeholder="Ex.: Mercado do mês" required />
+
+          <span class="rotulo">Categoria</span>
+          <div class="opcoes rosa" role="radiogroup" aria-label="Categoria" id="gas-categorias"></div>
+
+          <div class="nova-categoria" id="nova-categoria" hidden>
+            <input id="nova-categoria-nome" type="text" maxlength="40" placeholder="Nome da nova categoria (ex.: Pets)" />
+            <button type="button" class="rosa pequeno" id="btn-salvar-categoria">Salvar</button>
+            <button type="button" class="secundario pequeno" id="btn-cancelar-categoria">Cancelar</button>
+          </div>
+
+          <div class="linha">
+            <div>
+              <label for="gas-valor">Valor</label>
+              <div class="campo-moeda">
+                <span>R$</span>
+                <input id="gas-valor" name="valor" type="number" step="0.01" min="0.01" placeholder="0,00" required />
+              </div>
+            </div>
+            <div>
+              <label for="gas-data">Data</label>
+              <input id="gas-data" name="data_gasto" type="date" required />
+            </div>
+          </div>
+          <p class="erro" id="erro-gasto"></p>
+          <button type="submit" class="rosa">Adicionar gasto</button>
+        </form>
+
+        <div class="filtros" id="filtros-gastos" hidden>
+          <div class="filtros-linha">
+            <div class="busca">
+              <span aria-hidden="true">🔍</span>
+              <input type="search" data-filtro="busca" placeholder="Buscar gasto…" aria-label="Buscar gasto…" />
+            </div>
+            <select data-filtro="ordem" aria-label="Ordenar gastos">
+              <option value="recentes">Mais recentes</option>
+              <option value="antigos">Mais antigos</option>
+              <option value="maior">Maior valor</option>
+              <option value="menor">Menor valor</option>
+            </select>
+          </div>
+          <div class="chips-filtro" aria-label="Filtrar por grupo"></div>
+          <p class="resultado-filtro"></p>
+        </div>
+
+        <div class="tabela-wrap">
+          <table>
+            <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th class="valor">Valor</th><th></th></tr></thead>
+            <tbody id="lista-gastos"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Criar / editar caixinha -->
+  <dialog id="dlg-caixinha">
+    <form id="form-caixinha">
+      <h3 id="dlg-caixinha-titulo">Nova caixinha</h3>
+
+      <label for="cx-nome">Nome da caixinha</label>
+      <input id="cx-nome" name="nome" type="text" maxlength="60" placeholder="Ex.: Viagem para a praia" required />
+
+      <span class="rotulo">Tipo de meta</span>
+      <div class="opcoes" role="radiogroup" aria-label="Tipo de meta" id="cx-tipos"></div>
+
+      <label>Cor</label>
+      <div class="escolha-cor">
+        <label class="cor-op"><input type="radio" name="cor" value="azul" checked /><i class="cor-azul"></i>Azul</label>
+        <label class="cor-op"><input type="radio" name="cor" value="rosa" /><i class="cor-rosa"></i>Rosa</label>
+        <label class="cor-op"><input type="radio" name="cor" value="lilas" /><i class="cor-lilas"></i>Lilás</label>
+        <label class="cor-op"><input type="radio" name="cor" value="verde" /><i class="cor-verde"></i>Verde</label>
+      </div>
+
+      <div class="linha">
+        <div>
+          <label for="cx-meta">Meta (R$) <span class="opcional">opcional</span></label>
+          <input id="cx-meta" name="meta" type="number" step="0.01" min="0.01" placeholder="Ex.: 10000" />
+        </div>
+        <div>
+          <label for="cx-data-alvo">Quero chegar até <span class="opcional">opcional</span></label>
+          <input id="cx-data-alvo" name="data_alvo" type="date" />
+        </div>
+      </div>
+
+      <p class="erro" id="erro-caixinha"></p>
+      <div class="dlg-acoes">
+        <button type="button" class="excluir-caixinha" id="btn-excluir-caixinha" hidden>Excluir caixinha</button>
+        <span class="espaco"></span>
+        <button type="button" class="secundario" data-fechar>Cancelar</button>
+        <button type="submit">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Guardar / resgatar -->
+  <dialog id="dlg-movimento">
+    <form id="form-movimento">
+      <h3 id="dlg-movimento-titulo"></h3>
+      <p class="dlg-sub" id="dlg-movimento-sub"></p>
+      <input type="hidden" name="tipo" />
+
+      <div class="linha">
+        <div>
+          <label for="mov-valor">Valor (R$)</label>
+          <input id="mov-valor" name="valor" type="number" step="0.01" min="0.01" required />
+        </div>
+        <div>
+          <label for="mov-data">Data</label>
+          <input id="mov-data" name="data" type="date" required />
+        </div>
+      </div>
+      <label for="mov-descricao">Observação <span class="opcional">opcional</span></label>
+      <input id="mov-descricao" name="descricao" type="text" maxlength="200" placeholder="Ex.: Parte do plantão" />
+
+      <p class="erro" id="erro-movimento"></p>
+      <div class="dlg-acoes">
+        <span class="espaco"></span>
+        <button type="button" class="secundario" data-fechar>Cancelar</button>
+        <button type="submit" id="btn-confirmar-movimento">Confirmar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Criar / editar investimento -->
+  <dialog id="dlg-investimento">
+    <form id="form-investimento">
+      <h3 id="dlg-investimento-titulo">Novo investimento</h3>
+
+      <label for="inv-nome">Nome</label>
+      <input id="inv-nome" name="nome" type="text" maxlength="80" placeholder="Ex.: CDB 110% do CDI" required />
+
+      <span class="rotulo">Tipo</span>
+      <div class="opcoes" role="radiogroup" aria-label="Tipo de investimento" id="inv-tipos"></div>
+
+      <label for="inv-instituicao">Banco ou corretora <span class="opcional">opcional</span></label>
+      <input id="inv-instituicao" name="instituicao" type="text" maxlength="60" placeholder="Ex.: Nubank, Inter, XP" />
+
+      <div id="inv-inicial">
+        <div class="linha">
+          <div>
+            <label for="inv-valor-inicial">Valor já investido <span class="opcional">opcional</span></label>
+            <div class="campo-moeda">
+              <span>R$</span>
+              <input id="inv-valor-inicial" name="valor_inicial" type="number" step="0.01" min="0.01" placeholder="0,00" />
+            </div>
+          </div>
+          <div>
+            <label for="inv-data-inicial">Data do aporte</label>
+            <input id="inv-data-inicial" name="data_inicial" type="date" />
+          </div>
+        </div>
+      </div>
+
+      <p class="erro" id="erro-investimento"></p>
+      <div class="dlg-acoes">
+        <button type="button" class="excluir-caixinha" id="btn-excluir-investimento" hidden>Excluir investimento</button>
+        <span class="espaco"></span>
+        <button type="button" class="secundario" data-fechar>Cancelar</button>
+        <button type="submit">Salvar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Aporte / resgate / atualizar valor -->
+  <dialog id="dlg-inv-movimento">
+    <form id="form-inv-movimento">
+      <h3 id="dlg-inv-movimento-titulo"></h3>
+      <p class="dlg-sub" id="dlg-inv-movimento-sub"></p>
+      <input type="hidden" name="tipo" />
+
+      <div class="linha">
+        <div>
+          <label for="inv-mov-valor" id="inv-mov-valor-rotulo">Valor</label>
+          <div class="campo-moeda">
+            <span>R$</span>
+            <input id="inv-mov-valor" name="valor" type="number" step="0.01" min="0" placeholder="0,00" required />
+          </div>
+        </div>
+        <div>
+          <label for="inv-mov-data">Data</label>
+          <input id="inv-mov-data" name="data" type="date" required />
+        </div>
+      </div>
+      <p class="dica-campo" id="inv-mov-dica" hidden>
+        Abra o app do banco ou da corretora e informe quanto este investimento vale hoje (já com os rendimentos).
+      </p>
+      <label for="inv-mov-descricao">Observação <span class="opcional">opcional</span></label>
+      <input id="inv-mov-descricao" name="descricao" type="text" maxlength="200" />
+
+      <p class="erro" id="erro-inv-movimento"></p>
+      <div class="dlg-acoes">
+        <span class="espaco"></span>
+        <button type="button" class="secundario" data-fechar>Cancelar</button>
+        <button type="submit" id="btn-confirmar-inv-movimento">Confirmar</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Histórico do investimento -->
+  <dialog id="dlg-inv-historico">
+    <div class="dlg-conteudo">
+      <h3 id="dlg-inv-historico-titulo"></h3>
+      <div class="tabela-wrap">
+        <table>
+          <thead><tr><th>Data</th><th>Movimento</th><th>Observação</th><th class="valor">Valor</th><th></th></tr></thead>
+          <tbody id="lista-inv-movimentos"></tbody>
+        </table>
+      </div>
+      <div class="dlg-acoes">
+        <span class="espaco"></span>
+        <button type="button" class="secundario" data-fechar>Fechar</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Histórico da caixinha -->
+  <dialog id="dlg-historico">
+    <div class="dlg-conteudo">
+      <h3 id="dlg-historico-titulo"></h3>
+      <div class="tabela-wrap">
+        <table>
+          <thead><tr><th>Data</th><th>Movimento</th><th>Observação</th><th class="valor">Valor</th><th></th></tr></thead>
+          <tbody id="lista-movimentos"></tbody>
+        </table>
+      </div>
+      <div class="dlg-acoes">
+        <span class="espaco"></span>
+        <button type="button" class="secundario" data-fechar>Fechar</button>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="/js/graficos.js"></script>
+  <script src="/js/economia.js"></script>
+  <script src="/js/tipos.js"></script>
+  <script src="/js/metas.js"></script>
+  <script src="/js/investimentos.js"></script>
+  <script src="/js/relatorios.js"></script>
+</body>
+</html>

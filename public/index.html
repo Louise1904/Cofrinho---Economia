@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cofrinho · Entrar</title>
+  <link rel="icon" href="/img/logo.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="auth-wrap">
+    <div class="card">
+      <div class="marca">
+        <img class="logo-grande" src="/img/logo.svg" alt="" width="64" height="64" />
+        <h1>Cofrinho</h1>
+        <p class="slogan">finanças leves, sonhos no lugar</p>
+        <p id="subtitulo">Entre na sua conta</p>
+      </div>
+
+      <!-- Login -->
+      <form id="form-login">
+        <label for="login-email">E-mail</label>
+        <input id="login-email" name="email" type="email" required autocomplete="email" />
+
+        <label for="login-senha">Senha</label>
+        <input id="login-senha" name="senha" type="password" required autocomplete="current-password" />
+
+        <p class="erro" id="erro-login"></p>
+        <button type="submit">Entrar</button>
+        <p class="alternar">Não tem conta? <button type="button" class="link" data-ir="cadastro">Cadastre-se</button></p>
+      </form>
+
+      <!-- Cadastro -->
+      <form id="form-cadastro" hidden>
+        <label for="cad-nome">Nome</label>
+        <input id="cad-nome" name="nome" type="text" required autocomplete="name" />
+
+        <label for="cad-email">E-mail</label>
+        <input id="cad-email" name="email" type="email" required autocomplete="email" />
+
+        <label for="cad-senha">Senha (mínimo 6 caracteres)</label>
+        <input id="cad-senha" name="senha" type="password" required minlength="6" autocomplete="new-password" />
+
+        <label for="cad-confirma">Confirmar senha</label>
+        <input id="cad-confirma" name="confirma" type="password" required minlength="6" autocomplete="new-password" />
+
+        <p class="erro" id="erro-cadastro"></p>
+        <button type="submit">Criar conta</button>
+        <p class="alternar">Já tem conta? <button type="button" class="link" data-ir="login">Entrar</button></p>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/auth.js"></script>
+</body>
+</html>
